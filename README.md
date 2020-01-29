@@ -1,7 +1,7 @@
 # ServReqHandle
  
 ### Usage:
- servRequest.exe <serviceName> <code> <perm>(optional)
+ `servRequest.exe \<serviceName\> \<code\> \<perm\>(optional)`
  
  ## Parameters
  - ServiceName: Name of the service, wchar_t
