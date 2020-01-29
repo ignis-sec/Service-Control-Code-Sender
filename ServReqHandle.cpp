@@ -55,28 +55,28 @@ int main(int argc, char** argv){
 	LPSERVICE_STATUS servStat = new SERVICE_STATUS;
 	ControlService(hService, reqCode, servStat);
 	
-	
+	//current state of the service
 	std::cout << "\tCurrent State: "<< servStat->dwCurrentState;
 	auto t = statusMap.find(servStat->dwCurrentState);
-	if(t!=statusMap.end())
-		std::cout << " (" << t->second << ")" << std::endl;
-	else
-		std::cout << " (??????)" << std::endl;
+	//check status name from the map
+	if(t!=statusMap.end()) std::cout << " (" << t->second << ")" << std::endl;
+	else std::cout << " (??????)" << std::endl;
 
+	//service type
 	std::cout << "\tService type: " << servStat->dwServiceType;
-
 	auto tt = typeMap.find(servStat->dwServiceType);
-	if (tt != typeMap.end())
-		std::cout << " (" << tt->second << ")" << std::endl;
-	else
-		std::cout << " (??????)" << std::endl;
+	//check typename from the map
+	if (tt != typeMap.end()) std::cout << " (" << tt->second << ")" << std::endl;
+	else std::cout << " (??????)" << std::endl;
 
+	//output all accepted controls
 	std::cout << "\tControls Accepted: " << servStat->dwControlsAccepted;
 	for (auto it = controlMap.begin(); it != controlMap.end(); ++it)
 		if (it->second & servStat->dwControlsAccepted)
 			std::cout << " (" << it->first << ")";
 	std::cout << std::endl;
 
+	//rest of the values
 	std::cout << "\tCheckpoint: " << servStat->dwCheckPoint << std::endl;
 	std::cout << "\tWait hint: " << servStat->dwWaitHint << std::endl;
 	std::cout << "\tService Specific exit code: " << servStat->dwServiceSpecificExitCode << std::endl;
@@ -85,18 +85,22 @@ int main(int argc, char** argv){
 
 //parse permissions, ex: GENERIC_READ|GENERIC_WRITE
 DWORD parsePerms(std::string perms) {
+	//recursion termination
 	if (perms.empty()) return 0;
+	
 	DWORD ret = 0;
+	//delimiter is |
 	int dpos = perms.find("|");
 	std::string perm;
 	std::string rest;
+	//No delimiter found, this is either the only permission, or the last one.
 	if (dpos == std::string::npos) {
 		perm = perms;
 		rest = "";
 	}
+	//there is a delimiter, ignore rest for now
 	else {
-		perm = perms.substr(0, dpos);
-		dpos++;
+		perm = perms.substr(0, dpos++);
 		rest = perms.substr(dpos);
 	}
 	ret = permMap.find(perm)->second;
@@ -104,6 +108,8 @@ DWORD parsePerms(std::string perms) {
 	return ret | parsePerms(rest);
 }
 
+
+//initialize maps
 void initmaps() {
 	permMap["SERVICE_CONTROL_STOP"] = 0x1;
 	permMap["SERVICE_CONTROL_PAUSE"] = 0x2;
